@@ -227,6 +227,11 @@ main { flex: 1; }
 .report-panel-head button { color: #9dd4bb; border: 0; background: transparent; cursor: pointer; font-size: 11px; }
 .report-content > h2, .news-detail > h2 { font-size: 25px; line-height: 1.4; letter-spacing: -.04em; margin: 25px 0 8px; }
 .report-time, .detail-meta { color: rgba(255,255,255,.45); font-size: 10px; }
+.report-actions { margin: 18px 0 4px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.report-actions button { min-height: 36px; padding: 0 13px; border: 1px solid #9dd4bb; background: transparent; color: #b7e3cf; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; font-size: 10px; font-weight: 700; }
+.report-actions button:hover { background: rgba(157,212,187,.1); }
+.report-actions button:disabled { opacity: .55; cursor: wait; }
+.report-actions span { color: #9dd4bb; display: inline-flex; align-items: center; gap: 5px; font-size: 9px; }
 .report-sections { margin-top: 24px; }
 .report-sections article { display: grid; grid-template-columns: 28px 1fr; gap: 13px; padding: 17px 0; border-top: 1px solid rgba(255,255,255,.12); }
 .report-sections article > span { color: rgba(255,255,255,.3); font-size: 10px; }

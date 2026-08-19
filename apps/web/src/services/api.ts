@@ -46,6 +46,10 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     })
     if (!response.ok) {
       const body = (await response.json().catch(() => ({}))) as { code?: string; message?: string }
+      if (response.status === 401) {
+        localStorage.removeItem(TOKEN_KEY)
+        window.dispatchEvent(new CustomEvent('zhixuntong:auth-expired'))
+      }
       throw new ApiError(body.message ?? `请求失败（${response.status}）`, response.status, body.code)
     }
     return (await response.json()) as T
@@ -275,6 +279,18 @@ export const api = {
     if (apiMode === 'mock') return mockCall({ ok: true, channel: 'email', message: '预警邮件已进入发送队列' })
     return request<NotifyOut>('/api/notify/email', {
       method: 'POST', body: JSON.stringify({ kind: 'alert', alert_id: alertId, to: to || null }),
+    })
+  },
+
+  /**
+   * API 需求｜发送行业日报 / 周报邮件
+   * POST `/api/notify/email`；请求 `{ kind: "daily", report_id?, to? }`；返回 `{ ok, channel, message }`。
+   * report_id 为空时由后端发送最新报告；前端从情报页发送时传当前报告 id，收件人为空使用服务端默认配置。
+   */
+  async notifyDailyReport(reportId?: number | null, to?: string): Promise<NotifyOut> {
+    if (apiMode === 'mock') return mockCall({ ok: true, channel: 'email', message: '行业日报邮件已进入发送队列' })
+    return request<NotifyOut>('/api/notify/email', {
+      method: 'POST', body: JSON.stringify({ kind: 'daily', report_id: reportId || null, to: to || null }),
     })
   },
 

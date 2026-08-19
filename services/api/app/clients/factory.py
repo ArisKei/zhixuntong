@@ -34,9 +34,14 @@ def build_clients() -> Clients:
     notify: NotifyClient = (
         HttpNotifyClient(
             settings.dingtalk_webhook,
+            settings.dingtalk_secret,
             settings.smtp_host,
             settings.smtp_port,
             settings.smtp_from,
+            settings.smtp_default_to,
+            settings.smtp_user,
+            settings.smtp_password,
+            settings.smtp_use_tls,
         )
         if settings.notify_mode == "http"
         else LogNotifyClient()

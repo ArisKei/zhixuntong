@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { BellRing, Bot, Database, Gauge, LogOut, Menu, Radar, ShieldCheck, X } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { api, apiMode } from '@/services/api'
 
 const route = useRoute()
 const navOpen = ref(false)
-const showLogin = ref(!api.isAuthenticated())
+const authenticated = ref(api.isAuthenticated())
+const showLogin = ref(!authenticated.value)
 const username = ref('demo')
 const password = ref('demo123')
 const loginLoading = ref(false)
@@ -28,6 +29,7 @@ async function submitLogin() {
   loginError.value = ''
   try {
     await api.login(username.value.trim(), password.value)
+    authenticated.value = true
     showLogin.value = false
   } catch (error) {
     loginError.value = error instanceof Error ? error.message : '登录失败，请稍后重试'
@@ -38,8 +40,18 @@ async function submitLogin() {
 
 function logout() {
   api.logout()
+  authenticated.value = false
   showLogin.value = true
 }
+
+function handleAuthExpired() {
+  authenticated.value = false
+  showLogin.value = true
+  loginError.value = '登录已过期，请重新登录'
+}
+
+onMounted(() => window.addEventListener('zhixuntong:auth-expired', handleAuthExpired))
+onUnmounted(() => window.removeEventListener('zhixuntong:auth-expired', handleAuthExpired))
 </script>
 
 <template>
@@ -60,7 +72,7 @@ function logout() {
       </div>
     </header>
 
-    <main><div class="mobile-page-title">{{ pageTitle }}</div><RouterView /></main>
+    <main><div v-if="authenticated" class="mobile-page-title">{{ pageTitle }}</div><RouterView v-if="authenticated" /></main>
 
     <footer class="app-footer">
       <span>ZHIXUNTONG INTELLIGENCE OS</span><span>公开情报 × 企业知识 × AI 研判</span><span>数据更新于 2026.08.19</span>

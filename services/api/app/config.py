@@ -29,9 +29,14 @@ class Settings(BaseSettings):
     dify_base_url: str = "http://127.0.0.1:80"
     dify_api_key: str = ""
     dingtalk_webhook: str = ""
+    dingtalk_secret: str = ""
     smtp_host: str = "127.0.0.1"
     smtp_port: int = 1025
     smtp_from: str = "zhixuntong@example.com"
+    smtp_default_to: str = "demo@example.com"
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_use_tls: bool = False
 
     @property
     def cors_origin_list(self) -> list[str]:

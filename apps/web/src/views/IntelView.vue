@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowRight, CalendarDays, FileText, LoaderCircle, RefreshCw, Search, Sparkles } from 'lucide-vue-next'
+import { ArrowRight, CalendarDays, Check, FileText, LoaderCircle, Mail, RefreshCw, Search, Sparkles } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 
 import CategoryTag from '@/components/CategoryTag.vue'
@@ -17,6 +17,8 @@ const selectedNews = ref<NewsItem | null>(null)
 const report = ref<ReportItem | null>(null)
 const loading = ref(true)
 const generating = ref(false)
+const sendingReport = ref(false)
+const notifyMessage = ref('')
 const error = ref('')
 
 const filteredNews = computed(() => news.value.filter((item) => {
@@ -26,9 +28,9 @@ const filteredNews = computed(() => news.value.filter((item) => {
 }))
 const reportSections = computed(() => {
   if (!report.value) return []
-  return report.value.content_md.split(/\n(?=##\s)/).map((section) => {
+  return report.value.content_md.split(/^##\s+/m).slice(1).map((section) => {
     const [heading, ...body] = section.trim().split('\n')
-    return { heading: heading.replace(/^##\s*/, ''), body: body.join('\n').trim() }
+    return { heading, body: body.join('\n').trim() }
   }).filter((section) => section.heading)
 })
 
@@ -44,10 +46,21 @@ async function load() {
 }
 
 async function generateReport() {
-  generating.value = true; error.value = ''
+  generating.value = true; error.value = ''; notifyMessage.value = ''
   try { report.value = await api.analyze(7) }
   catch (caught) { error.value = caught instanceof Error ? caught.message : '周报生成失败' }
   finally { generating.value = false }
+}
+
+async function sendReport() {
+  if (!report.value) return
+  sendingReport.value = true; error.value = ''; notifyMessage.value = ''
+  try {
+    const result = await api.notifyDailyReport(report.value.id)
+    notifyMessage.value = result.message
+  } catch (caught) {
+    error.value = caught instanceof Error ? caught.message : '日报邮件发送失败'
+  } finally { sendingReport.value = false }
 }
 
 function formatDate(value: string) {
@@ -92,6 +105,10 @@ onMounted(load)
         <div v-else-if="report" class="report-content">
           <div class="report-panel-head"><span><FileText :size="16" />AI 行业周报</span><small><CalendarDays :size="14" />近 {{ report.range_days }} 天</small></div>
           <h2>{{ report.title }}</h2><p class="report-time">生成于 {{ report.created_at ? formatDate(report.created_at) : '刚刚' }}</p>
+          <div class="report-actions">
+            <button type="button" :disabled="sendingReport" @click="sendReport"><LoaderCircle v-if="sendingReport" :size="15" class="spin" /><Mail v-else :size="15" />{{ sendingReport ? '发送中…' : '发送日报邮件' }}</button>
+            <span v-if="notifyMessage"><Check :size="14" />{{ notifyMessage }}</span>
+          </div>
           <div class="report-sections"><article v-for="(section, index) in reportSections" :key="section.heading"><span>{{ String(index + 1).padStart(2, '0') }}</span><div><h3>{{ section.heading }}</h3><p>{{ section.body }}</p></div></article></div>
         </div>
         <div v-else class="report-empty"><FileText :size="28" /><strong>还没有行业周报</strong><p>点击“生成近 7 天周报”，让 AI 汇总六个固定主题。</p></div>

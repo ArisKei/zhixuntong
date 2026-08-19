@@ -12,9 +12,10 @@
 |---|---|---|
 | FastAPI 中台 | ✅ 已提供 | 登录、采集、新闻、知识库、AI 分析、预警与通知统一接口 |
 | Web 前端 | ✅ **开发完成** | Vue 3 五页面、Mock/真实接口切换、召回闭环与响应式布局 |
-| 爬虫 / RAGFlow / Dify / 通知 | 🚧 按分工联调 | 可继续通过中台 Mock Client 并行开发 |
+| 钉钉 / 邮件通知 | ✅ **开发完成** | 固定钉钉模板、Webhook 加签、HTML 邮件、SMTP/TLS 与日志降级 |
+| 爬虫 / RAGFlow / Dify | 🚧 按分工联调 | 可继续通过中台 Mock Client 并行开发 |
 
-前端已于 **2026-08-19** 完成第一版开发并通过类型检查、生产构建和主要 UI 流程验证。详细说明见 [apps/web/README.md](apps/web/README.md)。
+成员 E 的前端与通知职责已于 **2026-08-19** 全部完成，并通过通知单元测试、前端类型检查、生产构建和 FastAPI live 端到端流程验证。详细说明见 [apps/web/README.md](apps/web/README.md) 与 [services/notify/README.md](services/notify/README.md)。
 
 ---
 
@@ -108,5 +109,27 @@ npm run dev
 - 企业知识库上传、文档列表和试检索
 - 情报时间线、分类筛选与六段行业周报
 - 分级预警详情、钉钉与邮件推送
+- 行业日报 / 周报邮件发送
 
 接口接入需求已作为 `API 需求` 注释统一整理在 `apps/web/src/services/api.ts`。
+
+## 启用真实通知（成员 E 已完成）
+
+默认 `NOTIFY_MODE=log`，会输出完整消息但不触达外部系统。接入钉钉与 SMTP 时，在 `.env` 中改为：
+
+```env
+NOTIFY_MODE=http
+
+DINGTALK_WEBHOOK=https://oapi.dingtalk.com/robot/send?access_token=xxx
+DINGTALK_SECRET=
+
+SMTP_HOST=127.0.0.1
+SMTP_PORT=1025
+SMTP_FROM=zhixuntong@example.com
+SMTP_DEFAULT_TO=demo@example.com
+SMTP_USER=
+SMTP_PASSWORD=
+SMTP_USE_TLS=false
+```
+
+开发阶段可运行 `docker compose up -d mailhog`，然后在 http://127.0.0.1:8025 查看邮件。

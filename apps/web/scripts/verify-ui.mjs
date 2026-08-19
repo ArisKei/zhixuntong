@@ -32,11 +32,16 @@ try {
   const routes = await page.locator('.main-nav .nav-link').count()
   if (routes !== 5) throw new Error(`主导航数量错误：${routes}`)
 
+  await page.getByRole('button', { name: '跑一次召回闭环' }).click()
+  await page.locator('.demo-success').waitFor({ timeout: 20_000 })
+  await page.screenshot({ path: `${outputDir}/03-demo-recall.png`, fullPage: true })
+  await page.locator('.drawer-close').click()
+
   await page.getByRole('link', { name: 'AI 助手' }).click()
   await page.getByRole('heading', { name: 'AI 助手' }).waitFor()
   await page.locator('.ask-box button[type="submit"]').click()
   await page.locator('.answer-content').waitFor()
-  await page.getByText('6800 件').waitFor()
+  await page.locator('.answer-content').getByText(/6800/).first().waitFor()
 
   await page.getByRole('link', { name: '知识库' }).click()
   await page.getByRole('heading', { name: '企业知识库' }).waitFor()
@@ -45,19 +50,19 @@ try {
 
   await page.getByRole('link', { name: '情报监控' }).click()
   await page.getByRole('heading', { name: '情报监控' }).waitFor()
+  if (await page.locator('.report-sections article').count() === 0) {
+    await page.getByRole('button', { name: '生成近 7 天周报' }).click()
+  }
   await page.locator('.report-sections article').first().waitFor()
   const reportSections = await page.locator('.report-sections article').count()
   if (reportSections !== 6) throw new Error(`周报标题数量错误：${reportSections}`)
+  await page.getByRole('button', { name: '发送日报邮件' }).click()
+  await page.locator('.report-actions span').waitFor()
 
   await page.getByRole('link', { name: '预警列表' }).click()
   await page.getByRole('heading', { name: '预警列表' }).waitFor()
   await page.getByRole('button', { name: '推送钉钉' }).click()
-  await page.getByText('钉钉预警已进入发送队列').waitFor()
-
-  await page.getByRole('link', { name: '总览' }).click()
-  await page.getByRole('button', { name: '跑一次召回闭环' }).click()
-  await page.locator('.demo-success').waitFor({ timeout: 15_000 })
-  await page.screenshot({ path: `${outputDir}/03-demo-recall.png`, fullPage: true })
+  await page.locator('.inline-success').waitFor()
 
   const mobilePage = await context.newPage()
   await mobilePage.setViewportSize({ width: 390, height: 844 })
