@@ -1,0 +1,83 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "title": "某车企宣布召回12万辆新能源车",
+      "published_at": "2026-08-18T09:00:00+08:00",
+      "source": "ev_news",
+      "source_url": "https://example.com/n/recall-12w",
+      "category": "risk",
+      "company": "XX汽车",
+      "content": "某新能源汽车企业今日宣布召回12万辆汽车，初步原因为电池模组存在过热隐患。公司称将免费更换相关零部件，并同步通知经销商与车主。此次召回可能影响品牌信誉及供应链订单。",
+      "content_hash": "mock-recall-12w",
+      "keywords": ["召回", "新能源", "电池"],
+      "is_duplicate": false
+    },
+    {
+      "id": 2,
+      "title": "工信部就新能源汽车动力电池回收利用公开征求意见",
+      "published_at": "2026-08-17T10:30:00+08:00",
+      "source": "miit_policy",
+      "source_url": "https://example.com/n/miit-battery",
+      "category": "policy",
+      "company": null,
+      "content": "征求意见稿提出建立动力电池溯源管理体系，提高梯次利用比例，并进一步明确生产企业主体责任。",
+      "content_hash": "mock-miit-battery",
+      "keywords": ["政策", "电池", "回收"],
+      "is_duplicate": false
+    },
+    {
+      "id": 3,
+      "title": "新能源车购置税减免政策延续至2027年底",
+      "published_at": "2026-08-16T08:20:00+08:00",
+      "source": "miit_policy",
+      "source_url": "https://example.com/n/tax-extend",
+      "category": "policy",
+      "company": null,
+      "content": "新能源汽车车辆购置税减免政策延续实施，2026至2027年减免力度分档调整。",
+      "content_hash": "mock-tax-extend",
+      "keywords": ["政策", "购置税", "补贴"],
+      "is_duplicate": false
+    },
+    {
+      "id": 4,
+      "title": "国内动力电池装车量连续三月增长",
+      "published_at": "2026-08-15T14:00:00+08:00",
+      "source": "ev_news",
+      "source_url": "https://example.com/n/battery-volume",
+      "category": "market",
+      "company": null,
+      "content": "7月国内动力电池装车量同比上升，磷酸铁锂占比继续提高，储能需求同步回暖。",
+      "content_hash": "mock-battery-volume",
+      "keywords": ["市场", "电池", "装车量"],
+      "is_duplicate": false
+    },
+    {
+      "id": 5,
+      "title": "固态电池中试线投产，能量密度宣称提升两成",
+      "published_at": "2026-08-14T11:10:00+08:00",
+      "source": "ev_news",
+      "source_url": "https://example.com/n/solid-state",
+      "category": "tech",
+      "company": "XX汽车",
+      "content": "一条固态电池中试线宣布投产，并计划2027年小规模上车验证，良率和成本仍是主要瓶颈。",
+      "content_hash": "mock-solid-state",
+      "keywords": ["技术", "固态电池"],
+      "is_duplicate": false
+    },
+    {
+      "id": 6,
+      "title": "XX汽车发布新款纯电SUV并公布预售价",
+      "published_at": "2026-08-13T19:00:00+08:00",
+      "source": "oem_news",
+      "source_url": "https://example.com/n/suv-launch",
+      "category": "company",
+      "company": "XX汽车",
+      "content": "XX汽车推出新款纯电SUV，CLTC续航宣称超过700公里，并提供800V高压平台。",
+      "content_hash": "mock-suv-launch",
+      "keywords": ["新车", "SUV", "发布"],
+      "is_duplicate": false
+    }
+  ],
+  "meta": { "total": 6, "page": 1, "page_size": 20 }
+}

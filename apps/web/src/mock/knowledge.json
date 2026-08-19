@@ -1,0 +1,12 @@
+{
+  "query": "",
+  "citations": [
+    { "doc": "X1产品说明书.pdf", "page": 13, "snippet": "X1产品最大日处理能力为6800件，建议在标准温湿度环境下连续运行。", "score": 0.96 },
+    { "doc": "2026供应链韧性评估.pdf", "page": 8, "snippet": "电池模组与功率半导体仍是需重点监控的关键部件。", "score": 0.84 }
+  ],
+  "documents": [
+    { "id": 1, "filename": "X1产品说明书.pdf", "dataset": "enterprise", "status": "ready", "chunk_count": 12, "created_at": "2026-08-18T08:00:00+08:00" },
+    { "id": 2, "filename": "2026供应链韧性评估.pdf", "dataset": "enterprise", "status": "ready", "chunk_count": 28, "created_at": "2026-08-16T15:30:00+08:00" },
+    { "id": 3, "filename": "新能源行业术语库.docx", "dataset": "enterprise", "status": "ready", "chunk_count": 19, "created_at": "2026-08-12T10:20:00+08:00" }
+  ]
+}

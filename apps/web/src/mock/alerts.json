@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "alert_id": "alrt_20260818_001",
+      "level": "high",
+      "company": "XX汽车",
+      "title": "宣布召回12万辆新能源车",
+      "summary": "某车企宣布召回12万辆新能源车，涉及电池模组过热隐患。",
+      "impact": "可能影响品牌信誉及供应链订单",
+      "suggestion": "立即核对本公司是否使用相关零部件，并建立供应商专项排查清单",
+      "news_id": 1,
+      "citations": [{ "doc": "X1产品说明书.pdf", "page": 13, "snippet": "X1产品最大日处理能力为6800件。", "score": 0.91 }],
+      "created_at": "2026-08-18T09:08:00+08:00"
+    },
+    {
+      "alert_id": "alrt_20260811_002",
+      "level": "medium",
+      "company": "行业整体",
+      "title": "欧洲电动汽车关税政策调整",
+      "summary": "出口导向车企正在评估海外工厂与本地化供应链方案。",
+      "impact": "短期出口成本与交付节奏存在波动",
+      "suggestion": "持续跟踪重点市场税率与本地化产能变化",
+      "news_id": 8,
+      "citations": [],
+      "created_at": "2026-08-11T10:20:00+08:00"
+    }
+  ],
+  "meta": { "total": 2, "page": 1, "page_size": 20 }
+}

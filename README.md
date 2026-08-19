@@ -6,6 +6,18 @@
 
 ---
 
+## 开发进度
+
+| 模块 | 状态 | 说明 |
+|---|---|---|
+| FastAPI 中台 | ✅ 已提供 | 登录、采集、新闻、知识库、AI 分析、预警与通知统一接口 |
+| Web 前端 | ✅ **开发完成** | Vue 3 五页面、Mock/真实接口切换、召回闭环与响应式布局 |
+| 爬虫 / RAGFlow / Dify / 通知 | 🚧 按分工联调 | 可继续通过中台 Mock Client 并行开发 |
+
+前端已于 **2026-08-19** 完成第一版开发并通过类型检查、生产构建和主要 UI 流程验证。详细说明见 [apps/web/README.md](apps/web/README.md)。
+
+---
+
 ## 组员先看这里
 
 ### 必读（全员）
@@ -71,3 +83,30 @@ pip install -r requirements.txt
 **Token 怎么拿：** 先调 `POST /api/auth/login`，复制返回的 `access_token`，点右上角 Authorize 粘贴。
 
 **演示顺序：** login → crawler/start(`demo_recall`) → news → alert/evaluate → notify/dingtalk
+
+---
+
+## 启动前端（已完成）
+
+需要 Node.js 20+，建议先启动 FastAPI 中台；未启动中台时也可以使用默认 Mock 数据演示。
+
+```powershell
+cd apps/web
+npm install
+npm run dev
+```
+
+- 前端地址：http://127.0.0.1:5173
+- 演示账号：`demo` / `demo123`
+- 默认模式：`mock`
+- 真实接口模式：复制 `apps/web/.env.example` 为 `.env`，设置 `VITE_API_MODE=live`
+
+前端包含：
+
+- 首页情报总览与“一键召回闭环”
+- AI 助手及可核验引用
+- 企业知识库上传、文档列表和试检索
+- 情报时间线、分类筛选与六段行业周报
+- 分级预警详情、钉钉与邮件推送
+
+接口接入需求已作为 `API 需求` 注释统一整理在 `apps/web/src/services/api.ts`。
