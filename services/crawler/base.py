@@ -84,7 +84,7 @@ class CrawlStats:
     """一次采集的统计口径（字段名对齐契约 CrawlerTaskOut）。"""
 
     fetched: int = 0  # 列表页解析出的条目数
-    parsed: int = 0  # 详情页解析成功、进入 normalize 的条数（含后续因过短被丢弃的）
+    parsed: int = 0  # 详情页解析并通过清洗的有效条数（不含 dropped_short）
     dropped_short: int = 0  # 正文过短被丢弃的条数
     inserted: int = 0  # 入库新增（B8 填写）
     duplicated: int = 0  # 判定重复（B8 填写）
@@ -151,13 +151,13 @@ class BaseSpider(ABC):
                 continue
             if not parsed:
                 continue
-            stats.parsed += 1
 
             # 3) 清洗、对齐契约字段、计算去重哈希
             item = self.normalize(parsed)
             if item is None:
                 stats.dropped_short += 1
                 continue
+            stats.parsed += 1
             items.append(item)
 
         # 固定格式日志：第 2、3 行
@@ -440,7 +440,7 @@ if __name__ == "__main__":
 
     # 断言式自检：流水线贯通、清洗生效、哈希符合契约
     assert stats.fetched == 3, stats
-    assert stats.parsed == 3 and stats.dropped_short == 1, stats
+    assert stats.parsed == 2 and stats.dropped_short == 1, stats
     assert len(items) == 2, stats
     assert all(len(i.content) >= MIN_CONTENT_LEN for i in items)
     assert "alert" not in items[0].content and "display" not in items[0].content
@@ -544,7 +544,7 @@ if __name__ == "__main__":
     flaky = _FlakyDetailSpider(mode=MODE_FIXTURE)
     flaky_items, flaky_stats = flaky.run()
     assert flaky_stats.fetched == 3, flaky_stats
-    assert flaky_stats.parsed == 2 and flaky_stats.dropped_short == 1, flaky_stats
+    assert flaky_stats.parsed == 1 and flaky_stats.dropped_short == 1, flaky_stats
     assert len(flaky_items) == 1 and flaky_items[0].source_url == "https://example.com/n/1"
     print("[selftest] flaky detail ok（失败1条仅跳过，其余照常进入流水线）")
     print("[selftest] B10 限速+容错 专项验收通过")
