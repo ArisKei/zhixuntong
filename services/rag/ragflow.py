@@ -164,7 +164,7 @@ def _doc_to_out(doc: dict) -> KnowledgeDocOut:
     )
 
 
-def upload_document(filename: str, content: bytes) -> KnowledgeDocOut:
+def upload(filename: str, content: bytes) -> KnowledgeDocOut:
     """上传文档并触发解析，返回 KnowledgeDocOut。"""
     cfg = build_config()
     dataset_id = _ensure_dataset_id(cfg)

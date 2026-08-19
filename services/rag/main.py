@@ -27,7 +27,7 @@ async def handle_ragflow_error(_request: Request, exc: ragflow.RagflowError) -> 
 async def upload_document(file: UploadFile = File(...)):
     content = await file.read()
     filename = file.filename or "untitled.bin"
-    doc = ragflow.upload_document(filename, content)
+    doc = ragflow.upload(filename, content)
     return {"document": doc.model_dump()}
 
 
