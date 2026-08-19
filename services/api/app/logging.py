@@ -5,6 +5,10 @@ import structlog
 
 def setup_logging() -> None:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
+    # httpx logs complete request URLs at INFO. DingTalk Webhooks carry the
+    # access token in the query string, so keep transport logs below WARNING.
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("httpcore").setLevel(logging.WARNING)
     structlog.configure(
         processors=[
             structlog.processors.TimeStamper(fmt="iso"),
