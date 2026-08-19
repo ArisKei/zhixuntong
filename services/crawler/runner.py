@@ -273,7 +273,7 @@ if __name__ == "__main__":
     class _BrokenSpider(MiitPolicySpider):
         """模拟配错 URL 的坏源：列表页请求直接失败（连接被拒）。"""
 
-        def fetch(self, url: str, *, is_list: bool = False) -> str:
+        def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
             raise ConnectionError("connection refused (simulated)")
 
     tmp_db2 = Path(tempfile.gettempdir()) / "zxt_runner_selftest2.db"

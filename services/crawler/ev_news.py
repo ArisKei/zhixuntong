@@ -32,6 +32,13 @@ class EvNewsSpider(BaseSpider):
     source_id = "ev_news"
     # live 入口：第一电动网资讯频道（B11 实测：requests + 浏览器头 200，无需浏览器渲染）
     list_url = "https://www.d1ev.com/news"
+    max_pages = 10  # 多页采集（B16）：分页规律 /news/list-N，快照实测最后一页 6782
+
+    def _list_url_for_page(self, page: int) -> str | None:
+        """第 N 页 URL：https://www.d1ev.com/news/list-N（第 1 页为裸 URL）。"""
+        if page <= 1:
+            return self.list_url
+        return f"{self.list_url}/list-{page}"
 
     def parse_list(self, html: str) -> list[RawItem]:
         """列表页 → 待抓条目（fixture/live 结构不同，分发到对应 selectors）。"""
@@ -130,7 +137,9 @@ if __name__ == "__main__":
     class _LiveSnapshotSpider(EvNewsSpider):
         """live 模式但 fetch 读快照：全流水线离线可测（不发网络请求）。"""
 
-        def fetch(self, url: str, *, is_list: bool = False) -> str:
+        max_pages = 1  # B13 快照测试固定第 1 页；多页见 B16 专项自测
+
+        def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
             if is_list:
                 return snapshot["list.html"]
             name = url.rstrip("/").rsplit("/", 1)[-1] + ".html"
@@ -179,3 +188,54 @@ if __name__ == "__main__":
         f"company={first.company} | content_len={len(first.content)}"
     )
     print("[selftest] B13 验收通过：ev_news live 快照解析（≥8 条全流水线 + 零噪音泄漏）")
+
+    # ------------------------------------------------------------------
+    # B16 自测：live 多页翻页（任务卡 B16，离线快照）
+    # 验证：分页 URL 生成（/news/list-N）、逐页解析汇总、跨页条目不丢
+    # ------------------------------------------------------------------
+    paged_snapshots = {k: v for k, v in snapshot.items() if k.startswith("list_")}
+    assert "list_2.html" in paged_snapshots and "list_3.html" in paged_snapshots, "B16 缺多页快照"
+
+    class _PagedSnapshotSpider(EvNewsSpider):
+        max_pages = 3
+
+        def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
+            if is_list:
+                return snapshot[f"list.html" if page == 1 else f"list_{page}.html"]
+            name = url.rstrip("/").rsplit("/", 1)[-1] + ".html"
+            if name in snapshot:
+                return snapshot[name]
+            return snapshot["310950.html"]  # 复用已有详情快照供流水线消费
+
+    paged = _PagedSnapshotSpider(mode=MODE_LIVE)
+    pages_used: list[str] = []
+
+    orig_fetch = paged.fetch
+
+    def record_fetch(url, **kw):
+        if kw.get("is_list"):
+            pages_used.append(url)
+        return orig_fetch(url, **kw)
+
+    paged.fetch = record_fetch
+    paged_items, paged_stats = paged.run()
+
+    # 验收：3 页 URL 按序、行数累加、流水线全通
+    assert pages_used == [
+        "https://www.d1ev.com/news",
+        "https://www.d1ev.com/news/list-2",
+        "https://www.d1ev.com/news/list-3",
+    ], pages_used
+    expected_rows = sum(
+        len(selectors.parse_list_live(snapshot[f"list_{p}.html" if p > 1 else "list.html"]))
+        for p in (1, 2, 3)
+    )
+    assert paged_stats.fetched == expected_rows, (paged_stats.fetched, expected_rows)
+    assert paged_stats.fetched >= 40, paged_stats  # 3 页 × 20 条
+    assert len(paged_items) >= 8, paged_stats
+    assert all(i.content_hash == BaseSpider.make_hash(i.title, i.source_url) for i in paged_items)
+    print(
+        f"[selftest] B16 多页：ev_news live 3 页 URL={pages_used[1]} fetched={paged_stats.fetched} "
+        f"items={len(paged_items)}"
+    )
+    print("[selftest] B16 验收通过：live 多页翻页（URL 生成/逐页汇总/跨页流水线）")

@@ -108,6 +108,7 @@ class BaseSpider(ABC):
     request_interval: float = 1.0  # 限速：相邻请求最小间隔秒数（任务卡 B10，仅 live 生效）
     request_timeout: float = 10.0  # 网络请求超时秒数（仅 live 生效）
     use_browser: bool = False  # live 模式走 Selenium 无头浏览器（任务卡 B11：WAF 站点用）
+    max_pages: int = 1  # live 模式列表翻页数（任务卡 B16）；fixture 模式恒 1 页
 
     def __init__(self, mode: str = MODE_FIXTURE) -> None:
         if not self.source_id:
@@ -128,9 +129,15 @@ class BaseSpider(ABC):
 
         stats = CrawlStats()
 
-        # 1) 抓列表页 → 解析出待抓条目
-        list_html = self.fetch(self.list_url, is_list=True)
-        raw_items = self.parse_list(list_html)
+        # 1) 抓列表页（live 支持多页翻页，任务卡 B16）→ 汇总待抓条目
+        raw_items: list[RawItem] = []
+        for page, list_html in enumerate(self._list_page_htmls(self._effective_max_pages()), start=1):
+            rows = self.parse_list(list_html)
+            if not rows:
+                break
+            raw_items.extend(rows)
+            if self.mode == MODE_LIVE and len(raw_items) > 0:
+                print(f"[crawl] list page {page} rows={len(rows)} total={len(raw_items)}")
         stats.fetched = len(raw_items)
 
         items: list[NewsItem] = []
@@ -163,23 +170,53 @@ class BaseSpider(ABC):
 
     # ---------- 流水线各环节 ----------
 
-    def fetch(self, url: str, *, is_list: bool = False) -> str:
+    def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
         """取页面 HTML。fixture 模式读本地离线文件（网络被短路）；live 模式才发请求。
 
-        is_list=True 表示列表页：fixture 模式固定映射 fixtures/html/{source_id}/list.html。
+        is_list=True 表示列表页：fixture 模式映射 fixtures/html/{source_id}/list.html
+        （多页时第 n 页读 list_{n}.html，任务卡 B16）。
         live 模式：use_browser=True 的源（如工信部，创宇盾 WAF）走 Selenium 渲染，
         其余走 requests + 浏览器头。
+        page：列表页页码（fixture 多页文件名约定），live 模式不参与 URL 构造。
         """
         if self.mode == MODE_FIXTURE:
-            return self._fetch_fixture(url, is_list=is_list)
+            return self._fetch_fixture(url, is_list=is_list, page=page)
         if self.use_browser:
             return self._fetch_live_browser(url)
         return self._fetch_live(url)
 
-    def _fetch_fixture(self, url: str, *, is_list: bool) -> str:
+    # ---------- 多页翻页（任务卡 B16，live 生效） ----------
+
+    def _effective_max_pages(self) -> int:
+        """live 模式返回 max_pages；fixture 模式恒 1 页（答辩模式零影响）。"""
+        return self.max_pages if self.mode == MODE_LIVE else 1
+
+    def _list_url_for_page(self, page: int) -> str | None:
+        """第 page 页列表页 URL。默认仅第 1 页（list_url）；子类翻页覆写此方法。"""
+        if page <= 1:
+            return self.list_url
+        return None  # 无更多页
+
+    def _list_page_htmls(self, max_pages: int) -> Iterator[str]:
+        """逐页产出列表页 HTML。第 1 页失败向上抛（B10：配错 URL 冒泡给源级容错）；
+        第 n>1 页失败记日志停止翻页，不影响已收集条目。
+        """
+        for page in range(1, max_pages + 1):
+            url = self._list_url_for_page(page)
+            if url is None:
+                break
+            try:
+                yield self.fetch(url, is_list=True, page=page)
+            except Exception as exc:
+                if page == 1:
+                    raise
+                print(f"[crawl] list page {page} failed error={exc}, stop paging")
+                break
+
+    def _fetch_fixture(self, url: str, *, is_list: bool, page: int = 1) -> str:
         """离线模式：url 映射到 fixtures/html/{source_id}/ 下同名文件并读取。"""
         if is_list:
-            name = "list.html"  # 列表页文件名固定约定为 list.html
+            name = "list.html" if page == 1 else f"list_{page}.html"  # 多页约定 list_2.html...
         else:
             # 详情页取 url 文件名部分（如 https://x.com/n/1 → 1.html 需源侧配合命名）
             name = url.split("?")[0].rstrip("/").rsplit("/", 1)[-1] or "detail.html"
@@ -375,7 +412,7 @@ if __name__ == "__main__":
 
         source_id = "demo_b1"
 
-        def fetch(self, url: str, *, is_list: bool = False) -> str:
+        def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
             if is_list:
                 return DEMO_LIST
             return DEMO_DETAIL_SHORT if url.endswith("/3") else DEMO_DETAIL
@@ -497,7 +534,7 @@ if __name__ == "__main__":
 
         source_id = "demo_b10"
 
-        def fetch(self, url: str, *, is_list: bool = False) -> str:
+        def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
             if is_list:
                 return DEMO_LIST
             if url.endswith("/2"):

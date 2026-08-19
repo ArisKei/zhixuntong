@@ -94,6 +94,39 @@ def fetch(url: str) -> str:
     return _driver.page_source
 
 
+def fetch_paged(list_url: str, max_pages: int, wait: float | None = None) -> list[str]:
+    """多页列表（任务卡 B16）：同一浏览器会话内点击数字分页，逐页取渲染后 HTML。
+
+    适用场景：站点分页为 JS 驱动（href=javascript:;，如工信部实测共 86 页），
+    无法直接拼 URL 翻页。约定：页码链接的文本即页码数字（<a>2</a>、<a>3</a>）。
+    点击失败（已到底/页面结构变化）提前停止，返回已收集页；首屏加载失败直接抛错。
+    """
+    global _driver
+    if _driver is None:
+        _driver = _create_driver()
+    import time
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support.ui import WebDriverWait
+
+    _driver.get(list_url)  # 首屏加载失败 → 异常冒泡（源级容错接住）
+    htmls: list[str] = []
+    for page in range(1, max_pages + 1):
+        time.sleep(wait if wait is not None else _RENDER_WAIT)
+        htmls.append(_driver.page_source)
+        if page < max_pages:
+            try:
+                link = WebDriverWait(_driver, 8).until(
+                    EC.element_to_be_clickable(
+                        (By.XPATH, f'//a[normalize-space()="{page + 1}"]')
+                    )
+                )
+                link.click()
+            except Exception:
+                break  # 无下一页/结构变化 → 提前停止翻页
+    return htmls
+
+
 def quit() -> None:
     """关闭浏览器会话（进程退出前调用；未启动时是空操作）。"""
     global _driver

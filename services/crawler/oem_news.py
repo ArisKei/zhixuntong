@@ -37,10 +37,10 @@ class OemNewsSpider(BaseSpider):
     # 注意：byd.com.cn/news.html 会重定向到欧洲站，真实入口是 byd.com/cn/news
     list_url = "https://www.byd.com/cn/news"
 
-    def fetch(self, url: str, *, is_list: bool = False) -> str:
+    def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
         """live 分流：列表页 Selenium 渲染（Vue API 加载卡片），详情页 requests。"""
         if self.mode == MODE_FIXTURE:
-            return self._fetch_fixture(url, is_list=is_list)
+            return self._fetch_fixture(url, is_list=is_list, page=page)
         if is_list:
             return self._fetch_live_browser(url)  # 列表：Vue API 渲染，必须浏览器
         return self._fetch_live(url)  # 详情：服务端渲染，requests 足够
@@ -158,7 +158,7 @@ if __name__ == "__main__":
         快照只存了 9 个详情页，列表其余条目 fetch 抛 KeyError → 单条容错跳过。
         """
 
-        def fetch(self, url: str, *, is_list: bool = False) -> str:
+        def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
             if is_list:
                 return list_rendered
             name = url.rstrip("/").rsplit("/", 1)[-1] + ".html"  # /cn/detail632 → detail632.html

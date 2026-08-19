@@ -28,7 +28,7 @@ for _path in (str(CRAWLER_DIR), str(REPO_ROOT / "packages")):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
-from base import MODE_LIVE  # noqa: E402
+from base import MODE_LIVE, BaseSpider  # noqa: E402
 from ev_news import EvNewsSpider  # noqa: E402
 from miit_policy import MiitPolicySpider  # noqa: E402
 from oem_news import OemNewsSpider  # noqa: E402
@@ -80,10 +80,20 @@ def run_spider(spider, source_id: str):
     spider._fetch_live = _req
     spider._fetch_live_browser = _brw
 
+    # 路由测试聚焦分流决策：固定单页，翻页由 B16 专项（ev_news.py）覆盖
+    spider.max_pages = 1
+    if source_id == "miit_policy":
+        # miit 覆写了 live 点击翻页（会触发真实浏览器）→ 换回基类 URL 翻页路径
+        import types
+
+        spider._list_page_htmls = types.MethodType(
+            lambda self, n: BaseSpider._list_page_htmls(self, n), spider
+        )
+
     fetch_calls: list[dict] = []
     orig_fetch = spider.fetch
 
-    def _fetch_wrapper(url: str, *, is_list: bool = False) -> str:
+    def _fetch_wrapper(url: str, *, is_list: bool = False, page: int = 1) -> str:
         n_before = len(channel_calls)
         try:
             html = orig_fetch(url, is_list=is_list)

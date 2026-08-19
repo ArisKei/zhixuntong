@@ -22,7 +22,7 @@
 
 | 角色 | 负责目录 | 还要看 |
 |---|---|---|
-| 成员 B 爬虫 | `services/crawler` | [services/crawler/README.md](services/crawler/README.md)、[fixtures/seed/news.json](fixtures/seed/news.json) |
+| 成员 B 爬虫 | `services/crawler` | [services/crawler/README.md](services/crawler/README.md)、[services/crawler/AGENTS.md](services/crawler/AGENTS.md)、[fixtures/seed/news.json](fixtures/seed/news.json) |
 | 成员 C 知识库 | `services/rag` | [services/rag/README.md](services/rag/README.md) |
 | 成员 D AI 工作流 | `services/ai` | [services/ai/README.md](services/ai/README.md)、[docs/events.md](docs/events.md) |
 | 成员 E 前端/通知 | `apps/web`、`services/notify` | [apps/web/README.md](apps/web/README.md)、[services/notify/README.md](services/notify/README.md)、[docs/events.md](docs/events.md) |

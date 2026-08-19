@@ -27,6 +27,20 @@ class MiitPolicySpider(BaseSpider):
     # live 入口：工信部装备工业一司·工作动态（B11 实测创宇盾 WAF → live 走 Selenium 渲染）
     list_url = "https://www.miit.gov.cn/jgsj/zbys/gzdt/index.html"
     use_browser = True  # B11 连通性实测：requests 裸连/带 UA 均 403，无头 Chrome 可过
+    max_pages = 3  # 多页采集（B16）：分页 JS 驱动（共 86 页）→ live 走浏览器点击翻页
+
+    def _list_page_htmls(self, max_pages: int):
+        """live 列表翻页覆写（B16）：工信部分页是 javascript:; 点击翻页，URL 拼不出来。
+
+        live 走 browser.fetch_paged（同会话点击页码）；fixture 退回基类（第 1 页）。
+        """
+        if self.mode == MODE_LIVE and self.use_browser:
+            import browser
+
+            for html in browser.fetch_paged(self.list_url, max_pages):
+                yield html
+            return
+        yield from super()._list_page_htmls(max_pages)
 
     def parse_list(self, html: str) -> list[RawItem]:
         """列表页 → 待抓条目（fixture/live 结构不同，分发到对应 selectors）。"""
@@ -125,7 +139,10 @@ if __name__ == "__main__":
     class _LiveSnapshotSpider(MiitPolicySpider):
         """live 模式但 fetch 读 B11 快照：全流水线离线可测（不发网络请求）。"""
 
-        def fetch(self, url: str, *, is_list: bool = False) -> str:
+        use_browser = False  # 快照测试不发真实浏览器请求（B16 点击翻页仅 live+use_browser 走）
+        max_pages = 1  # 快照测试固定第 1 页；多页见下方 B16 专项断言
+
+        def fetch(self, url: str, *, is_list: bool = False, page: int = 1) -> str:
             if is_list:
                 return snapshot["list.html"]
             name = url.rstrip("/").rsplit("/", 1)[-1]
@@ -160,6 +177,12 @@ if __name__ == "__main__":
     assert len(rows) >= 5, len(rows)
     assert all(r["url"].startswith("https://www.miit.gov.cn/") for r in rows)
     assert all(r["date"] and re.match(r"\d{4}-\d{2}-\d{2}$", r["date"]) for r in rows)
+
+    # B16 多页：第 2 页快照解析（Selenium 点击翻页存档，结构与第 1 页一致）
+    if "list_2.html" in snapshot:
+        rows2 = selectors.parse_list_live(snapshot["list_2.html"])
+        assert len(rows2) >= 5, len(rows2)
+        print(f"[selftest] B16 多页：miit 第 2 页 rows={len(rows2)}")
 
     # 详情解析专项：带时分的时间串
     detail_files = [k for k in snapshot if k != "list.html"]
