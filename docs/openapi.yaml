@@ -1,0 +1,449 @@
+openapi: 3.1.0
+info:
+  title: 智讯通 FastAPI 中台
+  version: 0.1.0
+  description: |
+    全组唯一 HTTP 契约。路径与字段名冻结，组员只消费。
+    除 `/health`、`POST /api/auth/login` 外均需 Bearer Token。
+servers:
+  - url: http://127.0.0.1:8000
+paths:
+  /health:
+    get:
+      tags: [meta]
+      summary: 健康检查
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: ok }
+  /api/auth/login:
+    post:
+      tags: [auth]
+      summary: 演示账号登录
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginIn" }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenOut" }
+        "401":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorBody" }
+  /api/crawler/start:
+    post:
+      tags: [crawler]
+      summary: 启动一次采集
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CrawlerStartIn" }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CrawlerTaskOut" }
+  /api/crawler/status:
+    get:
+      tags: [crawler]
+      summary: 采集任务状态（不传 task_id 则返回最近一次）
+      parameters:
+        - in: query
+          name: task_id
+          schema: { type: string }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CrawlerTaskOut" }
+  /api/news:
+    get:
+      tags: [news]
+      summary: 新闻列表
+      parameters:
+        - in: query
+          name: category
+          schema:
+            $ref: "#/components/schemas/NewsCategory"
+        - in: query
+          name: days
+          schema: { type: integer, default: 7 }
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: page_size
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/NewsListOut" }
+  /api/news/{id}:
+    get:
+      tags: [news]
+      summary: 新闻详情
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/NewsOut" }
+  /api/knowledge/upload:
+    post:
+      tags: [knowledge]
+      summary: 上传企业文档（转调成员 C）
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, format: binary }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/KnowledgeUploadOut" }
+        "503":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorBody" }
+  /api/knowledge/search:
+    get:
+      tags: [knowledge]
+      summary: 检索；query 为空时返回文档列表
+      parameters:
+        - in: query
+          name: query
+          schema: { type: string }
+        - in: query
+          name: top_k
+          schema: { type: integer, default: 5 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/KnowledgeSearchOut" }
+        "503":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ErrorBody" }
+  /api/chat:
+    post:
+      tags: [ai]
+      summary: 统一问答（RAG + Dify WF1）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChatIn" }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ChatOut" }
+  /api/analyze:
+    post:
+      tags: [ai]
+      summary: 情报分析 / 周报（Dify WF2）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AnalyzeIn" }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportOut" }
+  /api/alert/evaluate:
+    post:
+      tags: [alert]
+      summary: 对一条新闻做风险研判（Dify WF3）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AlertEvaluateIn" }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AlertOut" }
+  /api/alerts:
+    get:
+      tags: [alert]
+      summary: 预警列表
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: page_size
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AlertListOut" }
+  /api/reports:
+    get:
+      tags: [report]
+      summary: 报告列表
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 1 }
+        - in: query
+          name: page_size
+          schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ReportListOut" }
+  /api/notify/dingtalk:
+    post:
+      tags: [notify]
+      summary: 发送钉钉预警
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DingTalkNotifyIn" }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/NotifyOut" }
+  /api/notify/email:
+    post:
+      tags: [notify]
+      summary: 发送邮件
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmailNotifyIn" }
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/NotifyOut" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  security:
+    - bearerAuth: []
+  schemas:
+    ErrorBody:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+    NewsCategory:
+      type: string
+      enum: [policy, company, market, tech, risk, other]
+    RiskLevel:
+      type: string
+      enum: [low, medium, high, critical]
+    TaskStatus:
+      type: string
+      enum: [pending, running, success, failed]
+    Citation:
+      type: object
+      required: [doc, snippet]
+      properties:
+        doc: { type: string }
+        page: { type: integer, nullable: true }
+        snippet: { type: string }
+        score: { type: number, nullable: true }
+    PageMeta:
+      type: object
+      properties:
+        total: { type: integer }
+        page: { type: integer }
+        page_size: { type: integer }
+    LoginIn:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string, example: demo }
+        password: { type: string, example: demo123 }
+    TokenOut:
+      type: object
+      required: [access_token, token_type]
+      properties:
+        access_token: { type: string }
+        token_type: { type: string, example: bearer }
+    CrawlerStartIn:
+      type: object
+      properties:
+        source_id:
+          type: string
+          default: all
+          description: miit_policy | ev_news | oem_news | all | demo_recall
+    CrawlerTaskOut:
+      type: object
+      required: [task_id, source_id, status]
+      properties:
+        task_id: { type: string }
+        source_id: { type: string }
+        status: { $ref: "#/components/schemas/TaskStatus" }
+        fetched: { type: integer }
+        parsed: { type: integer }
+        dropped_short: { type: integer }
+        inserted: { type: integer }
+        duplicated: { type: integer }
+        error_message: { type: string, nullable: true }
+        started_at: { type: string, format: date-time, nullable: true }
+        finished_at: { type: string, format: date-time, nullable: true }
+    NewsOut:
+      type: object
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        published_at: { type: string, format: date-time }
+        source: { type: string }
+        source_url: { type: string }
+        category: { $ref: "#/components/schemas/NewsCategory" }
+        company: { type: string, nullable: true }
+        content: { type: string }
+        content_hash: { type: string }
+        keywords:
+          type: array
+          items: { type: string }
+        is_duplicate: { type: boolean }
+    NewsListOut:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/NewsOut" }
+        meta: { $ref: "#/components/schemas/PageMeta" }
+    KnowledgeDocOut:
+      type: object
+      properties:
+        id: { type: integer }
+        filename: { type: string }
+        dataset: { type: string }
+        status: { type: string }
+        chunk_count: { type: integer }
+        created_at: { type: string, format: date-time }
+    KnowledgeUploadOut:
+      type: object
+      properties:
+        document: { $ref: "#/components/schemas/KnowledgeDocOut" }
+    KnowledgeSearchOut:
+      type: object
+      properties:
+        query: { type: string }
+        citations:
+          type: array
+          items: { $ref: "#/components/schemas/Citation" }
+        documents:
+          type: array
+          items: { $ref: "#/components/schemas/KnowledgeDocOut" }
+    ChatIn:
+      type: object
+      required: [query]
+      properties:
+        query: { type: string, example: X1产品最大日处理能力是多少？ }
+    ChatOut:
+      type: object
+      properties:
+        answer: { type: string }
+        citations:
+          type: array
+          items: { $ref: "#/components/schemas/Citation" }
+        workflow: { type: string, example: wf_knowledge_qa }
+    AnalyzeIn:
+      type: object
+      properties:
+        range_days: { type: integer, default: 7 }
+    ReportOut:
+      type: object
+      properties:
+        id: { type: integer, nullable: true }
+        title: { type: string }
+        kind: { type: string, enum: [daily, weekly, incident] }
+        range_days: { type: integer }
+        content_md: { type: string }
+        created_at: { type: string, format: date-time, nullable: true }
+    ReportListOut:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ReportOut" }
+        meta: { $ref: "#/components/schemas/PageMeta" }
+    AlertEvaluateIn:
+      type: object
+      required: [news_id]
+      properties:
+        news_id: { type: integer }
+    AlertOut:
+      type: object
+      required: [alert_id, level, company, title, summary, impact, suggestion, news_id]
+      properties:
+        alert_id: { type: string }
+        level: { $ref: "#/components/schemas/RiskLevel" }
+        company: { type: string }
+        title: { type: string }
+        summary: { type: string }
+        impact: { type: string }
+        suggestion: { type: string }
+        news_id: { type: integer }
+        citations:
+          type: array
+          items: { $ref: "#/components/schemas/Citation" }
+        created_at: { type: string, format: date-time, nullable: true }
+    AlertListOut:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/AlertOut" }
+        meta: { $ref: "#/components/schemas/PageMeta" }
+    DingTalkNotifyIn:
+      type: object
+      required: [alert_id]
+      properties:
+        alert_id: { type: string }
+    EmailNotifyIn:
+      type: object
+      required: [kind]
+      properties:
+        kind: { type: string, enum: [alert, daily] }
+        alert_id: { type: string, nullable: true }
+        report_id: { type: integer, nullable: true }
+        to: { type: string, nullable: true }
+    NotifyOut:
+      type: object
+      properties:
+        ok: { type: boolean }
+        channel: { type: string }
+        message: { type: string }

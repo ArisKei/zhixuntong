@@ -1,0 +1,82 @@
+[
+  {
+    "title": "某车企宣布召回12万辆新能源车",
+    "published_at": "2026-08-18T09:00:00+08:00",
+    "source": "ev_news",
+    "source_url": "https://example.com/n/recall-12w",
+    "category": "risk",
+    "company": "XX汽车",
+    "content": "某新能源汽车企业今日宣布召回12万辆汽车，初步原因为电池模组存在过热隐患。公司称将免费更换相关零部件，并同步通知经销商与车主。此次召回可能影响品牌信誉及供应链订单。",
+    "keywords": ["召回", "新能源", "电池"]
+  },
+  {
+    "title": "工信部就新能源汽车动力电池回收利用公开征求意见",
+    "published_at": "2026-08-17T10:30:00+08:00",
+    "source": "miit_policy",
+    "source_url": "https://example.com/n/miit-battery",
+    "category": "policy",
+    "company": null,
+    "content": "工业和信息化部发布新能源汽车动力电池回收利用管理办法征求意见稿，提出建立溯源管理、提高梯次利用比例，并明确生产企业主体责任。意见反馈截止于本月底。",
+    "keywords": ["政策", "电池", "回收"]
+  },
+  {
+    "title": "新能源车购置税减免政策延续至2027年底",
+    "published_at": "2026-08-16T08:20:00+08:00",
+    "source": "miit_policy",
+    "source_url": "https://example.com/n/tax-extend",
+    "category": "policy",
+    "company": null,
+    "content": "财政部、税务总局、工信部联合发文，新能源汽车车辆购置税减免政策延续实施，2026至2027年减免力度分档调整，插电混动车型仍在覆盖范围内。",
+    "keywords": ["政策", "购置税", "补贴"]
+  },
+  {
+    "title": "国内动力电池装车量连续三月增长",
+    "published_at": "2026-08-15T14:00:00+08:00",
+    "source": "ev_news",
+    "source_url": "https://example.com/n/battery-volume",
+    "category": "market",
+    "company": null,
+    "content": "行业机构数据显示，7月国内动力电池装车量同比上升，磷酸铁锂占比继续提高。储能需求同步回暖，部分正极材料企业排产上调。",
+    "keywords": ["市场", "电池", "装车量"]
+  },
+  {
+    "title": "固态电池中试线投产，能量密度宣称提升两成",
+    "published_at": "2026-08-14T11:10:00+08:00",
+    "source": "ev_news",
+    "source_url": "https://example.com/n/solid-state",
+    "category": "tech",
+    "company": "XX汽车",
+    "content": "一条半固态/固态电池中试线宣布投产，官方称能量密度较现有三元体系提升约20%，并计划2027年小规模上车验证。业内提醒良率和成本仍是主要瓶颈。",
+    "keywords": ["技术", "固态电池"]
+  },
+  {
+    "title": "XX汽车发布新款纯电SUV并公布预售价",
+    "published_at": "2026-08-13T19:00:00+08:00",
+    "source": "oem_news",
+    "source_url": "https://example.com/n/suv-launch",
+    "category": "company",
+    "company": "XX汽车",
+    "content": "XX汽车举行新品发布会，推出新款纯电SUV，CLTC续航宣称超过700公里，并提供800V高压平台。预售价区间公布后，竞品同级车型或将跟进调整权益。",
+    "keywords": ["新车", "SUV", "发布"]
+  },
+  {
+    "title": "头部车企加码智驾投入，城市NOA覆盖扩至更多城市",
+    "published_at": "2026-08-12T16:40:00+08:00",
+    "source": "oem_news",
+    "source_url": "https://example.com/n/noa",
+    "category": "tech",
+    "company": "XX汽车",
+    "content": "多家车企宣布城市领航辅助覆盖范围扩大，并强调安全员与用户教育。监管部门近日亦就智能网联汽车准入与上路通行试点补充说明。",
+    "keywords": ["智驾", "NOA"]
+  },
+  {
+    "title": "欧洲对部分电动汽车加征关税，出口企业评估转产",
+    "published_at": "2026-08-11T09:50:00+08:00",
+    "source": "ev_news",
+    "source_url": "https://example.com/n/tariff",
+    "category": "market",
+    "company": null,
+    "content": "出口导向车企正在评估海外工厂与本地化供应链方案，以对冲关税波动。部分企业考虑先以CKD形式过渡，再建设完整总装线。",
+    "keywords": ["出口", "关税"]
+  }
+]
