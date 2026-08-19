@@ -19,17 +19,28 @@
 
 ## 启动
 
+首次安装依赖：
+
 ```powershell
 npm install
-npm run dev
 ```
 
-默认使用 `src/mock` 中与 OpenAPI 同结构的演示数据。需要连接 FastAPI 中台时，复制 `.env.example` 为 `.env`，然后设置：
+日常开发推荐以前端 Live 模式连接已经启动的 FastAPI 中台：
+
+```powershell
+$env:VITE_API_MODE="live"
+$env:VITE_API_BASE_URL="http://127.0.0.1:8000"
+npm run dev -- --host 127.0.0.1 --port 5173
+```
+
+上述变量只对当前 PowerShell 终端生效。需要持久化时，复制 `.env.example` 为 `.env`，然后设置：
 
 ```env
 VITE_API_MODE=live
 VITE_API_BASE_URL=http://127.0.0.1:8000
 ```
+
+只运行 `npm run dev` 且未配置环境变量时，前端默认使用 `src/mock` 中与 OpenAPI 同结构的演示数据。修改环境变量后需要重启 Vite。
 
 演示账号：`demo` / `demo123`。
 

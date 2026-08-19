@@ -65,42 +65,55 @@
 
 ---
 
-## 组长：启动中台
+## 启动项目
 
-需要 Python 3.9+。
+需要 Python 3.9+、Node.js 20+。以下命令均从仓库根目录开始执行。
+
+### 首次安装（只需执行一次）
 
 ```powershell
 cd services/api
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+
+cd ../../apps/web
+npm install
+```
+
+### 日常启动
+
+打开两个 PowerShell 终端。
+
+终端一：启动 FastAPI 中台：
+
+```powershell
+cd services/api
+.\.venv\Scripts\Activate.ps1
 .\run.ps1
 ```
 
-- 健康检查：http://127.0.0.1:8000/health  
-- 接口文档：http://127.0.0.1:8000/docs  
-- 账号：`demo` / `demo123`
+终端二：以前端 Live 模式连接 FastAPI：
+
+```powershell
+cd apps/web
+$env:VITE_API_MODE="live"
+$env:VITE_API_BASE_URL="http://127.0.0.1:8000"
+npm run dev -- --host 127.0.0.1 --port 5173
+```
+
+- 前端地址：http://127.0.0.1:5173
+- 健康检查：http://127.0.0.1:8000/health
+- 接口文档：http://127.0.0.1:8000/docs
+- 演示账号：`demo` / `demo123`
+
+上述前端环境变量只对当前终端生效。需要持久化 Live 模式时，可复制 `apps/web/.env.example` 为 `apps/web/.env`，并设置相同的两个变量。只运行 `npm run dev` 且未配置环境变量时，前端使用 Mock 数据。
+
+修改仓库根目录 `.env` 中的钉钉或 SMTP 配置后，必须重启 FastAPI 才会生效。
 
 **Token 怎么拿：** 先调 `POST /api/auth/login`，复制返回的 `access_token`，点右上角 Authorize 粘贴。
 
 **演示顺序：** login → crawler/start(`demo_recall`) → news → alert/evaluate → notify/dingtalk
-
----
-
-## 启动前端（已完成）
-
-需要 Node.js 20+，建议先启动 FastAPI 中台；未启动中台时也可以使用默认 Mock 数据演示。
-
-```powershell
-cd apps/web
-npm install
-npm run dev
-```
-
-- 前端地址：http://127.0.0.1:5173
-- 演示账号：`demo` / `demo123`
-- 默认模式：`mock`
-- 真实接口模式：复制 `apps/web/.env.example` 为 `.env`，设置 `VITE_API_MODE=live`
 
 前端包含：
 
