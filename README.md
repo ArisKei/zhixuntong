@@ -13,8 +13,9 @@
 | 文件 | 干什么用 |
 |---|---|
 | [docs/小白协作说明书.md](docs/小白协作说明书.md) | **最先看**。组长做了什么、你做什么、怎么对接整合 |
-| [docs/openapi.yaml](docs/openapi.yaml) | 接口契约：路径、请求/响应字段，**禁止私自改名** |
-| [packages/schemas/README.md](packages/schemas/README.md) | 数据字段与枚举约定；你实现时的函数签名也在这 |
+| [docs/组员接口对照表.md](docs/组员接口对照表.md) | **谁实现哪些接口、传参/返回长什么样**（按 B/C/D/E 分列） |
+| [docs/openapi.yaml](docs/openapi.yaml) | 完整 OpenAPI 契约原文，**禁止私自改字段名** |
+| [packages/schemas/README.md](packages/schemas/README.md) | 数据字段与枚举；你实现时的函数签名 |
 | [docs/events.md](docs/events.md) | 预警 JSON、钉钉文案模板、周报六个标题（固定格式） |
 | [.env.example](.env.example) | 环境变量说明；组员做完后组长改这里对接真服务 |
 
@@ -22,10 +23,10 @@
 
 | 角色 | 负责目录 | 还要看 |
 |---|---|---|
-| 成员 B 爬虫 | `services/crawler` | [services/crawler/README.md](services/crawler/README.md)、[fixtures/seed/news.json](fixtures/seed/news.json) |
-| 成员 C 知识库 | `services/rag` | [services/rag/README.md](services/rag/README.md) |
-| 成员 D AI 工作流 | `services/ai` | [services/ai/README.md](services/ai/README.md)、[docs/events.md](docs/events.md) |
-| 成员 E 前端/通知 | `apps/web`、`services/notify` | [apps/web/README.md](apps/web/README.md)、[services/notify/README.md](services/notify/README.md)、[docs/events.md](docs/events.md) |
+| 成员 B 爬虫 | `services/crawler` | [接口对照表 · B](docs/组员接口对照表.md#1-成员-b--爬虫--入库)、[crawler README](services/crawler/README.md)、[fixtures/seed/news.json](fixtures/seed/news.json) |
+| 成员 C 知识库 | `services/rag` | [接口对照表 · C](docs/组员接口对照表.md#2-成员-c--ragflow-知识库)、[rag README](services/rag/README.md) |
+| 成员 D AI 工作流 | `services/ai` | [接口对照表 · D](docs/组员接口对照表.md#3-成员-d--dify-工作流)、[ai README](services/ai/README.md)、[events.md](docs/events.md) |
+| 成员 E 前端/通知 | `apps/web`、`services/notify` | [接口对照表 · E](docs/组员接口对照表.md#4-成员-e--钉钉--邮件--前端)、[web](apps/web/README.md)、[notify](services/notify/README.md) |
 
 ### 进阶 / 答辩（选读）
 
@@ -35,7 +36,7 @@
 | [docs/demo-script.md](docs/demo-script.md) | 答辩最后 4 分钟「召回闭环」讲稿 |
 | http://127.0.0.1:8000/docs | 中台跑起来后的在线接口文档（Swagger） |
 
-**克隆后怎么开工：** 先读小白协作说明书 → 只改自己的目录 → 字段名以 `openapi.yaml` / `packages/schemas` 为准 → 做完告诉组长对接。
+**克隆后怎么开工：** 小白协作说明书 → **组员接口对照表（看自己那一节）** → 只改自己的目录 → 字段名以契约为准 → 做完告诉组长对接。
 
 ---
 
