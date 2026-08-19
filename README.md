@@ -13,7 +13,8 @@
 | FastAPI 中台 | ✅ 已提供 | 登录、采集、新闻、知识库、AI 分析、预警与通知统一接口 |
 | Web 前端 | ✅ **开发完成** | Vue 3 五页面、Mock/真实接口切换、召回闭环与响应式布局 |
 | 钉钉 / 邮件通知 | ✅ **开发完成** | 固定钉钉模板、Webhook 加签、HTML 邮件、SMTP/TLS 与日志降级 |
-| 爬虫 / RAGFlow / Dify | 🚧 按分工联调 | 可继续通过中台 Mock Client 并行开发 |
+| 爬虫（成员 B） | ✅ **已合入** | fixture/live 双模式、三类信源、多页抓取；见 `services/crawler` |
+| RAGFlow / Dify | 🚧 按分工联调 | 可继续通过中台 Mock Client 并行开发 |
 
 成员 E 的前端与通知职责已于 **2026-08-19** 全部完成，并通过通知单元测试、前端类型检查、生产构建和 FastAPI live 端到端流程验证。详细说明见 [apps/web/README.md](apps/web/README.md) 与 [services/notify/README.md](services/notify/README.md)。
 
@@ -36,7 +37,7 @@
 
 | 角色 | 负责目录 | 还要看 |
 |---|---|---|
-| 成员 B 爬虫 | `services/crawler` | [接口对照表 · B](docs/组员接口对照表.md#1-成员-b--爬虫--入库)、[crawler README](services/crawler/README.md)、[fixtures/seed/news.json](fixtures/seed/news.json) |
+| 成员 B 爬虫 | `services/crawler` | [接口对照表 · B](docs/组员接口对照表.md#1-成员-b--爬虫--入库)、[crawler README](services/crawler/README.md)、[AGENTS.md](services/crawler/AGENTS.md)、[fixtures/seed/news.json](fixtures/seed/news.json) |
 | 成员 C 知识库 | `services/rag` | [接口对照表 · C](docs/组员接口对照表.md#2-成员-c--ragflow-知识库)、[rag README](services/rag/README.md) |
 | 成员 D AI 工作流 | `services/ai` | [接口对照表 · D](docs/组员接口对照表.md#3-成员-d--dify-工作流)、[ai README](services/ai/README.md)、[events.md](docs/events.md) |
 | 成员 E 前端/通知 | `apps/web`、`services/notify` | [接口对照表 · E](docs/组员接口对照表.md#4-成员-e--钉钉--邮件--前端)、[web](apps/web/README.md)、[notify](services/notify/README.md) |
